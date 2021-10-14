@@ -95,7 +95,6 @@ object FunctionalDataStructures {
     }
   }
 
-
   def sum3(ns: List[Int]) =
     foldRight(ns, 0)((x, y) => x + y)
 
@@ -109,13 +108,85 @@ object FunctionalDataStructures {
     foldRight(as, 0)((x, y) => 1 + y)
 
   // exercise 3.14
-  /*def append[A](as: List[A], a: A): List[A] = {
-    foldLeft(as, List(a))((x: List[A], y: List[A]) => {
-      x :: y
-    })
-  }*/
+  def append[A](as: List[A], a: A): List[A] = {
+    foldRight(as, List(a))((x, y) => x :: y)
+  }
+
+  // exercise 3.15
+  def concat[A](as: List[List[A]]): List[A] = {
+    foldLeft(as, List[A]())((x, y) => x ::: y)
+  }
+
+  def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = {
+    false
+  }
+
+
+  sealed trait Tree[+A]
+
+  case class Leaf[A](value: A) extends Tree[A]
+
+  case class Branch[A](value: A, left: Tree[A], right: Tree[A]) extends Tree[A]
+
+  // exercise 3.25
+  def size[A](tree: Tree[A]): Int = {
+    def go(tree: Tree[A], acc: Int): Int = {
+      tree match {
+        case Leaf(_) => acc + 1
+        case Branch(_, left, right) => go(left, 0) + go(right, 0) + acc + 1
+        case null => acc
+      }
+    }
+
+    go(tree, 0)
+  }
+
+  // exercise 3.26
+  def maximum(tree: Tree[Int]): Int = {
+    def go(tree: Tree[Int], currentMax: Int): Int = {
+      tree match {
+        case Branch(value, left, right) => go(left, value max currentMax) max go(right, value max currentMax)
+        case Leaf(value) => value max currentMax
+        case null => currentMax
+      }
+    }
+
+    go(tree, 0)
+  }
+
+  // exercise 3.27
+  def depth[A](tree: Tree[A]): Int = {
+    def go[A](tree: Tree[A], acc: Int): Int = {
+      tree match {
+        case Branch(_, left, right) => go(left, acc + 1) max go(right, acc + 1)
+        case Leaf(_) => acc + 1
+        case null => acc
+      }
+    }
+
+    go(tree, 0)
+  }
+
+  // exercise 3.28
+  def map[A, B](tree: Tree[A], f: A => B): Tree[B] = {
+    tree match {
+      case Branch(value, left, right) => Branch(f(value), map(left, f), map(right, f))
+      case Leaf(value) => Leaf(f(value))
+      case null => null
+    }
+  }
+
+  def fold[A, B](tree: Tree[A], z: B)(f: A => B): B = {
+    tree match {
+      case Branch(value, left, right) => {
+        f(value)
+        fold(left, z)(f)
+        fold(right, z)(f)
+      }
+    }
+  }
+
   @main def main(): Unit = {
-    //println(append((List(1, 2, 3, 4, 5)), 6))
   }
 }
 
